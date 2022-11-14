@@ -1,0 +1,61 @@
+import requests
+from lxml import etree
+from lxml.html import fromstring, tostring
+
+
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+def req_post(url, data):
+    response = requests.post(url, data)
+    return response.json()
+
+
+def req_get_text(url):
+    response = requests.get(url)
+    return response.text
+
+
+def list_first(lis):
+    return lis[0] if lis is not None else ""
+
+
+def start():
+    request_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
+    data = {
+        "sort_type": 200,
+        "cursor": str(1),
+        "limit": 20
+    }
+    resp_data_json = req_post(request_url, data)
+    data_list = resp_data_json['data']
+    if data_list:
+        for item_data in data_list:
+            item_type = item_data['item_type']
+            if item_type != 2:
+                continue
+            article_id = item_data['item_info']['article_id']
+            detail_url = "https://juejin.cn/post/" + article_id
+            detail_page(detail_url)
+            break
+
+
+def detail_page(url):
+    resp_data_text = req_get_text(url)
+    root = etree.HTML(resp_data_text)
+    title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
+    content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]')
+    title = list_first(title_s)
+    content = list_first(content_s)
+    content_html = tostring(content, encoding="utf-8").decode("utf-8")
+
+    print("content_html = ", content_html)
+    print("title = ", title)
+    print(type(title))
+
+
+if __name__ == '__main__':
+    try:
+        start()
+    except Exception as e:
+        print("异常", e)

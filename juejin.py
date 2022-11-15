@@ -1,7 +1,12 @@
+import traceback
+
 import requests
 from lxml import etree
-from lxml.html import fromstring, tostring
+from lxml.html import tostring
 
+from dao.articleDAO import ArticleDAO
+from dao.model.article import Article
+import json
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
@@ -17,7 +22,7 @@ def req_get_text(url):
 
 
 def list_first(lis):
-    return lis[0] if lis is not None else ""
+    return lis[0] if lis else ""
 
 
 def start():
@@ -37,21 +42,25 @@ def start():
             article_id = item_data['item_info']['article_id']
             detail_url = "https://juejin.cn/post/" + article_id
             detail_page(detail_url)
-            break
 
 
 def detail_page(url):
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
-    title_s = root.xpath('//*[@id="article_spider"]/div[1]/main/div/div[1]/article/h1/text()')
-    content_s = root.xpath('//*[@id="article_spider"]/div[1]/main/div/div[1]/article/div[4]')
+    title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
+    content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]/div')
     title = list_first(title_s)
     content = list_first(content_s)
-    content_html = tostring(content, encoding="utf-8").decode("utf-8")
-
-    print("content_html = ", content_html)
-    print("title = ", title)
-    print(type(title))
+    content_html = ''
+    if content != '':
+        content_html = tostring(content, encoding="utf-8").decode("utf-8")
+    print("保存: url=", url)
+    # 保存到数据库中
+    ArticleDAO.insert(Article(json.dumps({
+        'url': url,
+        'title': title,
+        'content': content_html
+    }, ensure_ascii=False), 'JUEJIN'))
 
 
 if __name__ == '__main__':
@@ -59,4 +68,6 @@ if __name__ == '__main__':
     try:
         start()
     except Exception as e:
+        msg = traceback.format_exc()  # 方式1
+        print(msg)
         print("异常", e)

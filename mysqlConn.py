@@ -37,13 +37,11 @@ class MysqlConnUtil:
         # 数据库名
         database='article_origin',
         # 字符编码
-        charset='utf8'
+
     )
 
-    def getConn(self):
+    @staticmethod
+    def getConn():
         return MysqlConnUtil.pool.connection()
-
-    def select(self, sql):
-        conn = self.getConn()
 
 

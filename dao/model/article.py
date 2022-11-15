@@ -1,14 +1,9 @@
 class Article:
-    def __init__(self, title='', content='', source='', created=0, updated=0):
-        self._title = title
+    def __init__(self, content='', source='', created=0, updated=0):
         self._content = content
         self._source = source
         self._created = created
         self._updated = updated
-
-    @property
-    def title(self):
-        return self._title
 
     @property
     def content(self):
@@ -25,3 +20,12 @@ class Article:
     @property
     def updated(self):
         return self._updated
+
+
+# class Content:
+#     def __init__(self, url='', title='', content=''):
+#         self._url = url
+#         self._title = title
+#         self._content = content
+#
+#

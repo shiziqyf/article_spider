@@ -43,8 +43,8 @@ def start():
 def detail_page(url):
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
-    title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
-    content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]')
+    title_s = root.xpath('//*[@id="article_spider"]/div[1]/main/div/div[1]/article/h1/text()')
+    content_s = root.xpath('//*[@id="article_spider"]/div[1]/main/div/div[1]/article/div[4]')
     title = list_first(title_s)
     content = list_first(content_s)
     content_html = tostring(content, encoding="utf-8").decode("utf-8")
@@ -55,6 +55,7 @@ def detail_page(url):
 
 
 if __name__ == '__main__':
+
     try:
         start()
     except Exception as e:

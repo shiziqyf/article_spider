@@ -64,10 +64,9 @@ def detail_page(url):
 
 
 if __name__ == '__main__':
-
     try:
         start()
     except Exception as e:
-        msg = traceback.format_exc()  # 方式1
+        msg = traceback.format_exc()
         print(msg)
         print("异常", e)

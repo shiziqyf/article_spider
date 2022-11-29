@@ -43,5 +43,3 @@ class MysqlConnUtil:
     @staticmethod
     def getConn():
         return MysqlConnUtil.pool.connection()
-
-

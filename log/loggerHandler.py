@@ -1,24 +1,23 @@
 import logging
-import os.path
 
 
 class LoggerHandler:
 
     def __init__(self, file_name, console=True):
         self.log = logging.getLogger(file_name)
-        formatter = logging.Formatter("%(asctime)s %(levelname)s - %(message)s",'%Y-%m-%d %H:%M:%S')
+        log_format = '%Y-%m-%d %H:%M:%S'
+        formatter = logging.Formatter("%(asctime)s %(levelname)s - %(message)s", log_format)
 
         # 文件
         if file_name:
             fh = logging.FileHandler(filename=file_name)
-            fh.setLevel(logging.DEBUG)
+            fh.setLevel(logging.INFO)
             fh.setFormatter(formatter)
             self.log.addHandler(fh)
+        # 控制台
         if console:
-            # 控制台
             ch = logging.StreamHandler()
-            ch.setLevel(logging.DEBUG)
+            ch.setLevel(logging.INFO)
             ch.setFormatter(formatter)
             self.log.addHandler(ch)
-        self.log.setLevel(logging.DEBUG)
-
+        self.log.setLevel(logging.INFO)

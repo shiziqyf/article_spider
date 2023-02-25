@@ -7,8 +7,6 @@ from lxml.html import tostring
 from dao.articleDAO import ArticleDAO
 from dao.model.article import Article
 import json
-
-
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
 def req_post(url, data):
@@ -56,11 +54,11 @@ def detail_page(url):
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
     print("保存: url=", url)
     # 保存到数据库中
-    ArticleDAO.insert(Article(json.dumps({
+    ArticleDAO.insert(Article(url, json.dumps({
         'url': url,
         'title': title,
         'content': content_html
-    }, ensure_ascii=False), 'JUEJIN'))
+    }, ensure_ascii=False), "JUEJIN"))
 
 
 if __name__ == '__main__':

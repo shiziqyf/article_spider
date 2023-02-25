@@ -1,13 +1,16 @@
 class Article:
-    def __init__(self, content='', source='', created=0, updated=0):
-        self._content = content
+    def __init__(self, origin_url, content_pack='', source=''):
+        self._origin_url = origin_url
+        self._content_pack = content_pack
         self._source = source
-        self._created = created
-        self._updated = updated
 
     @property
-    def content(self):
-        return self._content
+    def source_url(self):
+        return self._origin_url
+
+    @property
+    def content_pack(self):
+        return self._content_pack
 
     @property
     def source(self):
@@ -20,7 +23,6 @@ class Article:
     @property
     def updated(self):
         return self._updated
-
 
 # class Content:
 #     def __init__(self, url='', title='', content=''):

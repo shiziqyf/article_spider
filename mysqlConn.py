@@ -35,7 +35,7 @@ class MysqlConnUtil:
         # 数据库密码
         password='123456q.',
         # 数据库名
-        database='article_origin',
+        database='freedom_project',
         # 字符编码
 
     )

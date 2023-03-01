@@ -37,7 +37,6 @@ class MysqlConnUtil:
         # 数据库名
         database='freedom_project',
         # 字符编码
-
     )
 
     @staticmethod

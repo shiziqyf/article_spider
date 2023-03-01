@@ -3,5 +3,8 @@ from dao.articleDAO import ArticleDAO
 
 
 def saveArticle(article: Article):
-    # ArticleDAO.queryByArticleUrl(article.source_url)
-    ArticleDAO.insert(article)
+    oldArticle = ArticleDAO.queryOneByArticleUrl(article.source_url)
+    if oldArticle is None:
+        ArticleDAO.insert(article)
+
+

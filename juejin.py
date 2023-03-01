@@ -16,7 +16,7 @@ def req_post(url, data):
     return response.json()
 
 
-def req_get_text(url):
+def req_get_text(url: object) -> object:
     response = requests.get(url)
     return response.text
 
@@ -65,7 +65,9 @@ def detail_page(url):
 
 if __name__ == '__main__':
     try:
+        print("start......")
         start()
+        print("end.....")
     except Exception as e:
         msg = traceback.format_exc()
         print(msg)

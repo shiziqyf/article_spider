@@ -1,5 +1,5 @@
-def show():
-    print("show1")
+def show(name):
+    print("name = ", name)
 
 
 def show_v2():

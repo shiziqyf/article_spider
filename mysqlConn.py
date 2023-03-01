@@ -43,3 +43,11 @@ class MysqlConnUtil:
     @staticmethod
     def getConn():
         return MysqlConnUtil.pool.connection()
+
+    @staticmethod
+    def closeResource(cursor, conn):
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+

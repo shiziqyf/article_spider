@@ -10,3 +10,15 @@ class ArticleDAO:
         cursor = conn.cursor()
         cursor.execute(sql, (article.source, article.source_url, article.content_pack, "HTML", "INIT"))
         conn.commit()
+        MysqlConnUtil.closeResource(cursor, conn)
+
+    @staticmethod
+    def queryByArticleUrl(url: str):
+        sql = 'select * from  article_resource where source_url = %s'
+        conn = MysqlConnUtil.getConn()
+        cursor = conn.cursor()
+        cursor.execute(sql, url)
+        result = cursor.fetchall()
+        MysqlConnUtil.closeResource(cursor, conn)
+        print(result)
+        print(type(result))

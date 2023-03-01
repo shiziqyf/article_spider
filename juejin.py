@@ -1,12 +1,14 @@
+import json
 import traceback
 
 import requests
 from lxml import etree
 from lxml.html import tostring
 
-from dao.articleDAO import ArticleDAO
+import articleService
 from dao.model.article import Article
-import json
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
 def req_post(url, data):
@@ -54,7 +56,7 @@ def detail_page(url):
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
     print("保存: url=", url)
     # 保存到数据库中
-    ArticleDAO.insert(Article(url, json.dumps({
+    articleService.saveArticle(Article(url, json.dumps({
         'url': url,
         'title': title,
         'content': content_html

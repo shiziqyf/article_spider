@@ -16,7 +16,7 @@ def req_post(url, data):
     return response.json()
 
 
-def req_get_text(url: object) -> object:
+def req_get_text(url):
     response = requests.get(url)
     return response.text
 

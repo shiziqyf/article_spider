@@ -19,7 +19,7 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryOneByArticleUrl(url: str):
+    def queryOneByArticleUrl(url: str) -> Article:
         conn = None
         cursor = None
         try:

@@ -5,14 +5,17 @@ import requests
 from lxml import etree
 from lxml.html import tostring
 
-import articleService
 from dao.model.article import Article
 from reflact_test import show1
+from spider import common, article_service
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
 model_name = 'juejin'
+target_site_name = 'juejin'
 list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
+list_version = "1"
+detail_version = "1"
 
 
 def req_post_json(url, json_body):
@@ -30,11 +33,12 @@ def list_first(lis):
 
 
 def start():
+    serial_id = common.generate_serial_id(target_site_name)
     start_cursor = '0'
-    list_task(list_url, start_cursor)
+    list_task(serial_id, list_url, start_cursor)
 
 
-def list_task(request_url, cursor):
+def list_task(serial_id, request_url, cursor):
     data = {
         "sort_type": 300,
         "cursor": cursor,
@@ -46,10 +50,9 @@ def list_task(request_url, cursor):
     # TODO 生成 task
 
 
-def page_task_execute(request_url, data):
+def page_task_execute(serial_id, request_url, data):
     resp_data_json = req_post_json(request_url, data)
     next_cursor = resp_data_json['cursor']
-    list_task(list_url, next_cursor)
     data_list = resp_data_json['data']
     if data_list is None:
         return
@@ -61,8 +64,10 @@ def page_task_execute(request_url, data):
         detail_url = "https://juejin.cn/post/" + article_id
         # TODO 生成 task
 
+    list_task(serial_id, list_url, next_cursor)
 
-def detail_task_execute(request_url):
+
+def detail_task_execute(serial_id, request_url):
     resp_data_text = req_get_text(request_url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')

@@ -7,12 +7,16 @@ from lxml.html import tostring
 
 import articleService
 from dao.model.article import Article
-
+from reflact_test import show1
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-def req_post(url, data):
-    response = requests.post(url, data)
+model_name = 'juejin'
+list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
+
+
+def req_post_json(url, json_body):
+    response = requests.post(url=url, json=json_body)
     return response.json()
 
 
@@ -25,27 +29,42 @@ def list_first(lis):
     return lis[0] if lis else ""
 
 
+
+
 def start():
-    request_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
+    start_cursor = '0'
+    list_task(list_url, start_cursor)
+
+
+def list_task(request_url, cursor):
     data = {
-        "sort_type": 200,
-        "cursor": str(1),
-        "limit": 20
+        "sort_type": 300,
+        "cursor": cursor,
+        "limit": 20,
+        "id_type": 2,
+        "client_type": 2608
     }
-    resp_data_json = req_post(request_url, data)
+    # TODO 生成 task
+
+
+def page_task_execute(request_url, data):
+    resp_data_json = req_post_json(request_url, data)
+    next_cursor = resp_data_json['cursor']
+    list_task(list_url, next_cursor)
     data_list = resp_data_json['data']
-    if data_list:
-        for item_data in data_list:
-            item_type = item_data['item_type']
-            if item_type != 2:
-                continue
-            article_id = item_data['item_info']['article_id']
-            detail_url = "https://juejin.cn/post/" + article_id
-            detail_page(detail_url)
+    if data_list is None:
+        return
+    for item_data in data_list:
+        item_type = item_data['item_type']
+        if item_type != 2:
+            continue
+        article_id = item_data['item_info']['article_id']
+        detail_url = "https://juejin.cn/post/" + article_id
+        # TODO 生成 task
 
 
-def detail_page(url):
-    resp_data_text = req_get_text(url)
+def detail_task_execute(request_url):
+    resp_data_text = req_get_text(request_url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
     content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]/div')
@@ -54,10 +73,10 @@ def detail_page(url):
     content_html = ''
     if content != '':
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
-    print("保存: url=", url)
+    print("保存: url=", request_url)
     # 保存到数据库中
-    articleService.saveArticle(Article(url, json.dumps({
-        'url': url,
+    articleService.saveArticle(Article(request_url, json.dumps({
+        'url': request_url,
         'title': title,
         'content': content_html
     }, ensure_ascii=False), "JUEJIN"))
@@ -66,7 +85,8 @@ def detail_page(url):
 if __name__ == '__main__':
     try:
         print("start......")
-        start()
+        show1.show()
+        # page()
         print("end.....")
     except Exception as e:
         msg = traceback.format_exc()

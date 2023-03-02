@@ -29,8 +29,6 @@ def list_first(lis):
     return lis[0] if lis else ""
 
 
-
-
 def start():
     start_cursor = '0'
     list_task(list_url, start_cursor)
@@ -44,6 +42,7 @@ def list_task(request_url, cursor):
         "id_type": 2,
         "client_type": 2608
     }
+
     # TODO 生成 task
 
 

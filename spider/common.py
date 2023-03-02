@@ -11,3 +11,7 @@ def generate_task_id(site_name, url, params, version):
 def generate_serial_id(target_site_name):
     current_time = int(round(time.time() * 1000))
     return str(target_site_name) + ":" + str(current_time) + str(random.randint(0, 1000))
+
+
+def get_current_time():
+    return int(round(time.time() * 1000))

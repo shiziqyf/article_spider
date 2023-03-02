@@ -6,16 +6,19 @@ from lxml import etree
 from lxml.html import tostring
 
 from dao.model.article import Article
+from dao.model.task import Task
 from reflact_test import show1
-from spider import common, article_service
+from spider import common, article_service, task_service
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-model_name = 'juejin'
+model_name = 'spider.juejin'
 target_site_name = 'juejin'
 list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
 list_version = "1"
 detail_version = "1"
+list_repeat_keep_time = 14400000  # 4小时
+detail_repeat_keep_time = -1  # 永久
 
 
 def req_post_json(url, json_body):
@@ -38,20 +41,24 @@ def start():
     list_task(serial_id, list_url, start_cursor)
 
 
-def list_task(serial_id, request_url, cursor):
-    data = {
+def list_task(serial_id, url, cursor):
+    params = {
         "sort_type": 300,
         "cursor": cursor,
         "limit": 20,
         "id_type": 2,
         "client_type": 2608
     }
+    now_time = common.get_current_time()
+    repeat_expire_time = now_time + list_repeat_keep_time
+    task_id = common.generate_task_id(target_site_name, url, params, list_version)
+    task = Task(identifies=task_id, name="掘金文章列表爬取任务", status=0, module_name=model_name, execute_func_name="page_task_execute",
+                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=None, created_time=now_time)
+    task_service.save_task(task)
 
-    # TODO 生成 task
 
-
-def page_task_execute(serial_id, request_url, data):
-    resp_data_json = req_post_json(request_url, data)
+def page_task_execute(serial_id, url, params):
+    resp_data_json = req_post_json(url, params)
     next_cursor = resp_data_json['cursor']
     data_list = resp_data_json['data']
     if data_list is None:
@@ -79,7 +86,7 @@ def detail_task_execute(serial_id, request_url):
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
     print("保存: url=", request_url)
     # 保存到数据库中
-    articleService.saveArticle(Article(request_url, json.dumps({
+    article_service.saveArticle(Article(request_url, json.dumps({
         'url': request_url,
         'title': title,
         'content': content_html

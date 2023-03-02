@@ -8,12 +8,12 @@ class TaskDAO:
         conn = None
         cursor = None
         try:
-            sql = 'insert into spider_task(identifies, name, status, module_name, execute_func_name, params, task_type, serial_id, expire_time, priority) ' \
+            sql = 'insert into spider_task(identifies, name, status, module_name, execute_func_name, params, task_type, serial_id, repeat_expire_time, priority, created_time) ' \
                   'values (%s,%s, %s, %s, %s,%s,%s, %s, %s, %s)'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, (task.identifies, task.name, task.status, task.module_name, task.execute_func_name, task.params,
-                                 task.task_type, task.serial_id, task.serial_id, task.expire_time, task.priority))
+                                 task.task_type, task.serial_id, task.serial_id, task.repeat_expire_time, task.priority, task.created_time))
             conn.commit()
         except Exception:
             raise
@@ -30,7 +30,6 @@ class TaskDAO:
             cursor = conn.cursor()
             cursor.execute(sql, identifies)
             result = cursor.fetchone()
-            MysqlConnUtil.closeResource(cursor, conn)
             return result
         except Exception:
             raise
@@ -42,21 +41,16 @@ class TaskDAO:
         conn = None
         cursor = None
         try:
-            # name, status, module_name, execute_func_name, params, task_type, serial_id, expire_time, priority
             sql = 'update spider_task set'
             sql_part, params = TaskDAO.generate_updated_sql(task)
             if params is None or len(params) == 0:
-                return 0
+                return
             sql = sql + sql_part + ' where id=%s limit 1'
             params.append(task_id)
-            print("updated_sql : ", sql)
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, params)
-            result = cursor.fetchone()
             conn.commit()
-            MysqlConnUtil.closeResource(cursor, conn)
-            return result
         except Exception:
             raise
         finally:
@@ -79,9 +73,3 @@ class TaskDAO:
                 sql = sql + " ," + key + "=%s"
             params.append(str(value))
         return sql, params
-
-
-if __name__ == '__main__':
-    task = Task(name="test e", identifies="122")
-    count = TaskDAO.updatedById("2", task)
-    print("count: ", count)

@@ -1,5 +1,6 @@
 from dao.model.task import Task
 from mysqlConn import MysqlConnUtil
+import pandas as pd
 
 
 class TaskDAO:
@@ -15,8 +16,8 @@ class TaskDAO:
             cursor.execute(sql, (task.identifies, task.name, task.status, task.module_name, task.execute_func_name, str(task.params),
                                  task.task_type, task.serial_id, task.repeat_expire_time, task.priority, task.created_time))
             conn.commit()
-        except Exception:
-            raise
+        except Exception as e:
+            raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)
 
@@ -25,14 +26,14 @@ class TaskDAO:
         conn = None
         cursor = None
         try:
-            sql = 'select * from  spider_task where identifies = %s'
+            sql = 'select * from spider_task where identifies = %s'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, identifies)
             result = cursor.fetchone()
-            return result
-        except Exception:
-            raise
+            return TaskDAO.resultToTask(cursor, result)
+        except Exception as e:
+            raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)
 
@@ -51,14 +52,30 @@ class TaskDAO:
             cursor = conn.cursor()
             cursor.execute(sql, params)
             conn.commit()
-        except Exception:
-            raise
+        except Exception as e:
+            raise e
+        finally:
+            MysqlConnUtil.closeResource(cursor, conn)
+
+    @staticmethod
+    def queryEarliestTask():
+        conn = None
+        cursor = None
+        try:
+            sql = 'select * from spider_task where status = 0 order by priority desc, created_time asc limit 1'
+            conn = MysqlConnUtil.getConn()
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            return TaskDAO.resultToTask(cursor, result)
+        except Exception as e:
+            raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
     def generate_updated_sql(task: Task):
-        sql = ""
+        sql = ''
         params = []
         property_map = task.__dict__
         first = True
@@ -67,9 +84,21 @@ class TaskDAO:
             if value is None:
                 continue
             if first:
-                sql = sql + " " + key + "=%s"
+                sql = sql + ' ' + key + '=%s'
                 first = False
             else:
-                sql = sql + " ," + key + "=%s"
+                sql = sql + ' ,' + key + '=%s'
             params.append(str(value))
         return sql, params
+
+    @staticmethod
+    def resultToTask(cursor, result):
+        if result is None:
+            return None
+        i = 0
+        task_dirt = {}
+        for item in result:
+            title = cursor.description[i][0]
+            task_dirt[title] = item
+            i = i + 1
+        return Task(**task_dirt)

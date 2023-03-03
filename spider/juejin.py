@@ -7,10 +7,7 @@ from lxml.html import tostring
 
 from dao.model.article import Article
 from dao.model.task import Task
-from reflact_test import show1
 from spider import common, article_service, task_service
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
 model_name = 'spider.juejin'
 target_site_name = 'juejin'
@@ -54,9 +51,10 @@ def list_task(serial_id, url, cursor):
     task_id = common.generate_task_id(target_site_name, url, params, list_version)
     task_execute_func_params = {
         "url": url,
-        "req_params": params
+        "req_params": params,
+        'serial_id': serial_id
     }
-    task = Task(identifies=task_id, name="掘金文章列表爬取任务", status=0, module_name=model_name, execute_func_name="page_task_execute",
+    task = Task(identifies=task_id, name="juejin_list", status=0, module_name=model_name, execute_func_name="page_task_execute",
                 task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=task_execute_func_params, created_time=now_time)
     task_service.save_task(task)
 
@@ -99,9 +97,14 @@ def detail_task_execute(serial_id, request_url):
 
 if __name__ == '__main__':
     try:
+        start_time = common.get_current_time()
         print("start......")
+        # for i in range(1, 10000):
         start()
+        end_time = common.get_current_time()
         print("end.....")
+        print("cost_time(ms):", end_time - start_time)
+
     except Exception as e:
         msg = traceback.format_exc()
         print(msg)

@@ -14,7 +14,7 @@ class ArticleDAO:
             cursor.execute(sql, (article.source, article.source_url, article.content_pack, "HTML", "INIT"))
             conn.commit()
         except Exception as e:
-            raise
+            raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)
 
@@ -31,6 +31,6 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
             return result
         except Exception as e:
-            raise
+            raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)

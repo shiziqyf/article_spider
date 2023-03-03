@@ -71,13 +71,23 @@ def page_task_execute(serial_id, url, req_params):
             continue
         article_id = item_data['item_info']['article_id']
         detail_url = "https://juejin.cn/post/" + article_id
-        # TODO 生成 task
+
+        now_time = common.get_current_time()
+        repeat_expire_time = now_time + list_repeat_keep_time
+        task_id = common.generate_task_id(target_site_name, detail_url, article_id, detail_version)
+        task_execute_func_params = {
+            "url": detail_url,
+            'serial_id': serial_id
+         }
+        task = Task(identifies=task_id, name="juejin_detail", status=0, module_name=model_name, execute_func_name="detail_task_execute",
+                    task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=task_execute_func_params, created_time=now_time)
+        task_service.save_task(task)
 
     list_task(serial_id, list_url, next_cursor)
 
 
-def detail_task_execute(serial_id, request_url):
-    resp_data_text = req_get_text(request_url)
+def detail_task_execute(serial_id, url):
+    resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
     content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]/div')
@@ -86,10 +96,10 @@ def detail_task_execute(serial_id, request_url):
     content_html = ''
     if content != '':
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
-    print("保存: url=", request_url)
+    print("保存: url=", url)
     # 保存到数据库中
-    article_service.saveArticle(Article(request_url, json.dumps({
-        'url': request_url,
+    article_service.saveArticle(Article(url, json.dumps({
+        'url': url,
         'title': title,
         'content': content_html
     }, ensure_ascii=False), "JUEJIN"))

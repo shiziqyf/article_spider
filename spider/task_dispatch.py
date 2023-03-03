@@ -1,3 +1,5 @@
+import time
+
 from dao.model.task import Task
 from dao.taskDAO import TaskDAO
 
@@ -5,6 +7,9 @@ from dao.taskDAO import TaskDAO
 def start():
     # 获取最早的优先级最高的任务
     task = TaskDAO.queryEarliestTask()
+    print("task = ", task)
+    if task is None:
+        return
     execute_task(task)
 
 
@@ -21,9 +26,13 @@ def execute_task(task: Task):
             f()
         else:
             f(**dirt_param)
+    update_task = Task(status=1)
+    TaskDAO.updatedById(task_id=task.id, task=update_task)
 
 
 if __name__ == '__main__':
-    start()
+    while True:
+        time.sleep(1)
+        start()
     # test = eval("")
     # print(test)

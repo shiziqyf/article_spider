@@ -9,11 +9,11 @@ class TaskDAO:
         cursor = None
         try:
             sql = 'insert into spider_task(identifies, name, status, module_name, execute_func_name, params, task_type, serial_id, repeat_expire_time, priority, created_time) ' \
-                  'values (%s,%s, %s, %s, %s,%s,%s, %s, %s, %s)'
+                  'values (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql, (task.identifies, task.name, task.status, task.module_name, task.execute_func_name, task.params,
-                                 task.task_type, task.serial_id, task.serial_id, task.repeat_expire_time, task.priority, task.created_time))
+            cursor.execute(sql, (task.identifies, task.name, task.status, task.module_name, task.execute_func_name, str(task.params),
+                                 task.task_type, task.serial_id, task.repeat_expire_time, task.priority, task.created_time))
             conn.commit()
         except Exception:
             raise

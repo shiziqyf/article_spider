@@ -52,13 +52,17 @@ def list_task(serial_id, url, cursor):
     now_time = common.get_current_time()
     repeat_expire_time = now_time + list_repeat_keep_time
     task_id = common.generate_task_id(target_site_name, url, params, list_version)
+    task_execute_func_params = {
+        "url": url,
+        "req_params": params
+    }
     task = Task(identifies=task_id, name="掘金文章列表爬取任务", status=0, module_name=model_name, execute_func_name="page_task_execute",
-                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=None, created_time=now_time)
+                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=task_execute_func_params, created_time=now_time)
     task_service.save_task(task)
 
 
-def page_task_execute(serial_id, url, params):
-    resp_data_json = req_post_json(url, params)
+def page_task_execute(serial_id, url, req_params):
+    resp_data_json = req_post_json(url, req_params)
     next_cursor = resp_data_json['cursor']
     data_list = resp_data_json['data']
     if data_list is None:
@@ -96,8 +100,7 @@ def detail_task_execute(serial_id, request_url):
 if __name__ == '__main__':
     try:
         print("start......")
-        show1.show()
-        # page()
+        start()
         print("end.....")
     except Exception as e:
         msg = traceback.format_exc()

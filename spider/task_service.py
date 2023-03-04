@@ -3,19 +3,25 @@ from dao.taskDAO import TaskDAO
 from spider import common
 
 
-def save_task(task: Task) -> bool:
+def save_task(task: Task):
+    result = {}
+    not_repeat = True
     oldTask = TaskDAO.queryOneByIdentifies(task.identifies)
     if oldTask is None:
         TaskDAO.insert(task)
-        return True
+        not_repeat = True
     else:
         repeat_expire_time = oldTask.repeat_expire_time
         if repeat_expire_time is None or repeat_expire_time < 0:
             # 没有过期时间
-            return False
+            not_repeat = False
         else:
             if repeat_expire_time > common.get_current_time():
                 # 任务重复时间还没过期
-                return False
-            TaskDAO.updatedById(oldTask.id, task)
-            return True
+                not_repeat = False
+            else:
+                TaskDAO.updatedById(oldTask.id, task)
+                not_repeat = True
+
+    result["not_repeat"] = not_repeat
+    return result

@@ -1,6 +1,5 @@
 from dao.model.task import Task
 from mysqlConn import MysqlConnUtil
-import pandas as pd
 
 
 class TaskDAO:

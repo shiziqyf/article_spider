@@ -1,23 +1,21 @@
 import json
-import time
-import traceback
 
 import requests
 from lxml import etree
 from lxml.html import tostring
 
+import global_var
 from dao.model.article import Article
 from dao.model.task import Task
-from log.log_instance import biz_log
-from spider import common, article_service, task_service, task_dispatch
+from spider import common, article_service, task_service
 
 model_name = 'spider.juejin'
 target_site_name = 'juejin'
 list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
 list_version = "1"
 detail_version = "1"
-# list_repeat_keep_time = 14400000  # 4小时
-list_repeat_keep_time = 1000  # 1秒
+list_repeat_keep_time = 14400000  # 4小时
+# list_repeat_keep_time = 1000  # 1秒
 detail_repeat_keep_time = -1  # 永久
 
 
@@ -35,10 +33,14 @@ def list_first(lis):
     return lis[0] if lis else ""
 
 
-def start():
-    serial_id = common.generate_serial_id(target_site_name)
-    start_cursor = '0'
-    list_task(serial_id, list_url, start_cursor)
+def juejin_spider_start():
+    biz_log = global_var.get_value('biz_log')
+    try:
+        serial_id = common.generate_serial_id(target_site_name)
+        start_cursor = '0'
+        list_task(serial_id, list_url, start_cursor)
+    except Exception as e:
+        biz_log.error(e)
 
 
 def list_task(serial_id, url, cursor):
@@ -64,6 +66,7 @@ def list_task(serial_id, url, cursor):
 
 
 def page_task_execute(serial_id, url, req_params, model):
+    # biz_log.info('page_task_execute, url')
     resp_data_json = req_post_json(url, req_params)
     next_cursor = resp_data_json['cursor']
     data_list = resp_data_json['data']
@@ -98,37 +101,23 @@ def page_task_execute(serial_id, url, req_params, model):
 
 
 def detail_task_execute(serial_id, url):
+    biz_log = global_var.get_value('biz_log')
+    biz_log.info('juejin_detail_task_execute, url=%s', url)
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
     content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]/div')
+    published_time_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[3]/div/div[2]/time/text()')
     title = list_first(title_s)
     content = list_first(content_s)
+    published_time = list_first(published_time_s)
     content_html = ''
     if content != '':
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
-    print("保存: url=", url)
     # 保存到数据库中
     article_service.saveArticle(Article(url, json.dumps({
         'url': url,
         'title': title,
-        'content': content_html
+        'content': content_html,
+        'published_time': published_time
     }, ensure_ascii=False), "JUEJIN"))
-
-
-if __name__ == '__main__':
-    task_dispatch.start_with_new_thread()
-    try:
-        start_time = common.get_current_time()
-        print("start......")
-        while True:
-            time.sleep(1)
-            start()
-        end_time = common.get_current_time()
-        print("end.....")
-        print("cost_time(ms):", end_time - start_time)
-
-    except Exception as e:
-        msg = traceback.format_exc()
-        print(msg)
-        print("异常", e)

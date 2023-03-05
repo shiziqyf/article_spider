@@ -1,4 +1,4 @@
-from reflact_test import show1
+from reflect_test import show1
 
 if __name__ == '__main__':
     # log = LoggerHandler("test.log").log

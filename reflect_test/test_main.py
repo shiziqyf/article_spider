@@ -3,4 +3,4 @@ if __name__ == '__main__':
     CC = __import__(imp, fromlist=True)
     inp_func = input("请输入要执行的函数：")
     f = getattr(CC, inp_func, None)
-    f(name="eee", age=12)
+    f(name="eee")

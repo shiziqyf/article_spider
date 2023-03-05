@@ -2,6 +2,9 @@ import logging
 
 import logging.handlers
 
+import global_var
+from config import settings
+
 
 class LoggerHandler:
 
@@ -25,3 +28,9 @@ class LoggerHandler:
             ch.setFormatter(formatter)
             self.log.addHandler(ch)
         self.log.setLevel(logging.INFO)
+
+    @staticmethod
+    def init_log():
+        print("start init log......")
+        biz_log = LoggerHandler(settings.log.biz_file).log
+        global_var.set_value('biz_log', biz_log)

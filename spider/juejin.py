@@ -8,6 +8,7 @@ from lxml.html import tostring
 
 from dao.model.article import Article
 from dao.model.task import Task
+from log.log_instance import biz_log
 from spider import common, article_service, task_service, task_dispatch
 
 model_name = 'spider.juejin'
@@ -16,7 +17,7 @@ list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?sp
 list_version = "1"
 detail_version = "1"
 # list_repeat_keep_time = 14400000  # 4小时
-list_repeat_keep_time = 1000  # 4小时
+list_repeat_keep_time = 1000  # 1秒
 detail_repeat_keep_time = -1  # 永久
 
 
@@ -83,7 +84,7 @@ def page_task_execute(serial_id, url, req_params, model):
             'serial_id': serial_id
         }
         task = Task(identifies=task_id, name="juejin_detail", status=0, module_name=model_name, execute_func_name="detail_task_execute",
-                    task_type=None, serial_id=serial_id, repeat_expire_time=-1, priority=2, params=task_execute_func_params, created_time=now_time)
+                    task_type=None, serial_id=serial_id, repeat_expire_time=detail_repeat_keep_time, priority=2, params=task_execute_func_params, created_time=now_time)
         save_result = task_service.save_task(task)
         has_no_repeat_task = save_result["not_repeat"]
         if has_no_repeat_task:

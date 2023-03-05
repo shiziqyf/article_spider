@@ -1,5 +1,7 @@
 import logging
 
+import logging.handlers
+
 
 class LoggerHandler:
 
@@ -10,7 +12,9 @@ class LoggerHandler:
 
         # 文件
         if file_name:
-            fh = logging.FileHandler(filename=file_name)
+            # fh = logging.FileHandler(filename=file_name)
+            fh = logging.handlers.TimedRotatingFileHandler(filename=file_name, when='d', interval=1, backupCount=7)
+            fh.suffix = "%Y-%m-%d_%H-%M-%S.log"
             fh.setLevel(logging.INFO)
             fh.setFormatter(formatter)
             self.log.addHandler(fh)

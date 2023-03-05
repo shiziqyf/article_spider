@@ -1,5 +1,5 @@
 from dao.model.article import Article
-from mysqlConn import MysqlConnUtil
+from dao.mysqlConn import MysqlConnUtil
 
 
 class ArticleDAO:

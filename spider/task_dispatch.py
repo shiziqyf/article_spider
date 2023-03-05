@@ -23,14 +23,14 @@ def execute_task(task: Task):
             model_name = task.module_name
             func_name = task.execute_func_name
             params = task.params
-            dirt_param = eval(params)
+            dict_param = eval(params)
             model = __import__(model_name, fromlist=True)
             f = getattr(model, func_name, None)
             if f is not None:
-                if dirt_param is None or len(dirt_param) == 0:
+                if dict_param is None or len(dict_param) == 0:
                     f()
                 else:
-                    f(**dirt_param)
+                    f(**dict_param)
             update_task = Task(status=1)
             TaskDAO.updatedById(task_id=task.id, task=update_task)
             return

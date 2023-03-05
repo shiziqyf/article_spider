@@ -1,5 +1,5 @@
 from dao.model.task import Task
-from mysqlConn import MysqlConnUtil
+from dao.mysqlConn import MysqlConnUtil
 
 
 class TaskDAO:

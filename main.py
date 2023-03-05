@@ -1,5 +1,8 @@
 import os
 import sys
+
+from config import settings
+
 if __name__ == '__main__':
     args = sys.argv
     config_file_name = 'dev.toml'
@@ -7,3 +10,5 @@ if __name__ == '__main__':
         config_file_name = str(args[1]) + ".toml"
 
     os.environ["INCLUDES_FOR_DYNACONF"] = "['{}']".format(config_file_name)
+    app_name = settings.app.name
+    print("app_name = ", app_name)

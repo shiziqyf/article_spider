@@ -32,7 +32,7 @@ def execute_task(task: Task):
                 if dict_param is None or len(dict_param) == 0:
                     f()
                 else:
-                    f(**dict_param)
+                    f(execute_params=dict_param)
             update_task = Task(status=1)
             TaskDAO.updatedById(task_id=task.id, task=update_task)
             return
@@ -53,4 +53,5 @@ def start():
 
 def start_with_new_thread():
     thread = threading.Thread(target=start)
+    thread.daemon = True
     thread.start()

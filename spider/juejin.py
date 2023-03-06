@@ -12,7 +12,7 @@ from spider import common, article_service, task_service
 model_name = 'spider.juejin'
 target_site_name = 'juejin'
 list_url = 'https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed?spider=0'
-list_version = "1"
+list_version = "2"
 detail_version = "1"
 list_repeat_keep_time = 14400000  # 4小时
 # list_repeat_keep_time = 1000  # 1秒
@@ -26,7 +26,8 @@ def req_post_json(url, json_body):
 
 def req_get_text(url):
     response = requests.get(url)
-    return response.text
+    return response.content.decode('utf-8', 'ignore')
+    # return response.text.encode('utf-8').decode('utf-8')
 
 
 def list_first(lis):
@@ -35,12 +36,13 @@ def list_first(lis):
 
 def juejin_spider_start():
     biz_log = global_var.get_value('biz_log')
-    try:
-        serial_id = common.generate_serial_id(target_site_name)
-        start_cursor = '0'
-        list_task(serial_id, list_url, start_cursor)
-    except Exception as e:
-        biz_log.error(e)
+    biz_log.info('juejin_spider start....')
+    # try:
+    #     serial_id = common.generate_serial_id(target_site_name)
+    #     start_cursor = '0'
+    #     list_task(serial_id, list_url, start_cursor)
+    # except Exception as e:
+    #     biz_log.error(e)
 
 
 def list_task(serial_id, url, cursor):
@@ -65,7 +67,15 @@ def list_task(serial_id, url, cursor):
     task_service.save_task(task)
 
 
-def page_task_execute(serial_id, url, req_params, model):
+def page_task_execute(execute_params):
+    biz_log = global_var.get_value('biz_log')
+    url = execute_params['url']
+    biz_log.info('juejin_page_task_execute, url=%s, params=%s', url, execute_params)
+    req_params = execute_params['req_params']
+    serial_id = execute_params['serial_id']
+    model = ''
+    if 'model' in execute_params:
+        model = execute_params['model']
     # biz_log.info('page_task_execute, url')
     resp_data_json = req_post_json(url, req_params)
     next_cursor = resp_data_json['cursor']
@@ -92,7 +102,7 @@ def page_task_execute(serial_id, url, req_params, model):
         has_no_repeat_task = save_result["not_repeat"]
         if has_no_repeat_task:
             need_continue_list = True
-    print(need_continue_list)
+    biz_log.info('need_continue_list = %s', need_continue_list)
     # if next_cursor
     if model == 'FULL':
         list_task(serial_id, list_url, next_cursor)
@@ -100,8 +110,9 @@ def page_task_execute(serial_id, url, req_params, model):
         list_task(serial_id, list_url, next_cursor)
 
 
-def detail_task_execute(serial_id, url):
+def detail_task_execute(execute_params):
     biz_log = global_var.get_value('biz_log')
+    url = execute_params['url']
     biz_log.info('juejin_detail_task_execute, url=%s', url)
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)

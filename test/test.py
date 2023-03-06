@@ -1,4 +1,12 @@
 from reflect_test import show1
+import time
+
+import schedule as schedule
+
+
+def job():
+    print("do job......")
+
 
 if __name__ == '__main__':
     # log = LoggerHandler("test.log").log
@@ -12,4 +20,9 @@ if __name__ == '__main__':
     # print("func = ", inp_func)
     # f = getattr(CC, inp_func, None)
     # f(11)
-    show1.show(123)
+    # show1.show(123)
+    schedule.every(10).seconds.do(job)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+        print("schedule....")

@@ -67,7 +67,7 @@ def list_task(serial_id, url, cursor):
     task_service.save_task(task)
 
 
-def page_task_execute(execute_params):
+def page_task_execute(task_id, execute_params):
     biz_log = global_var.get_value('biz_log')
     url = execute_params['url']
     biz_log.info('juejin_page_task_execute, url=%s, params=%s', url, execute_params)
@@ -110,10 +110,10 @@ def page_task_execute(execute_params):
         list_task(serial_id, list_url, next_cursor)
 
 
-def detail_task_execute(execute_params):
+def detail_task_execute(task_id, execute_params):
     biz_log = global_var.get_value('biz_log')
     url = execute_params['url']
-    biz_log.info('juejin_detail_task_execute, url=%s', url)
+    biz_log.info('juejin_detail_task_execute, url=%s, task_id=%s', url, task_id)
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
@@ -121,6 +121,9 @@ def detail_task_execute(execute_params):
     published_time_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[3]/div/div[2]/time/text()')
     title = list_first(title_s)
     content = list_first(content_s)
+    if len(content) < 1:
+        biz_log.error("juejin detail content is blank, task_id=%s", task_id)
+        return
     published_time = list_first(published_time_s)
     content_html = ''
     if content != '':

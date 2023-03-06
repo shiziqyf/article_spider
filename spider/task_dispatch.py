@@ -30,9 +30,9 @@ def execute_task(task: Task):
             f = getattr(model, func_name, None)
             if f is not None:
                 if dict_param is None or len(dict_param) == 0:
-                    f()
+                    f(task_id=task.id)
                 else:
-                    f(execute_params=dict_param)
+                    f(task_id=task.id, execute_params=dict_param)
             update_task = Task(status=1)
             TaskDAO.updatedById(task_id=task.id, task=update_task)
             return

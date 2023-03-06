@@ -26,7 +26,7 @@ def req_post_json(url, json_body):
 
 def req_get_text(url):
     response = requests.get(url)
-    return response.content.decode('utf-8', 'ignore')
+    return response.content.decode('utf-8', 'ignore').encode('gbk', 'replace').decode('gbk', 'replace')
     # return response.text.encode('utf-8').decode('utf-8')
 
 
@@ -36,13 +36,13 @@ def list_first(lis):
 
 def juejin_spider_start():
     biz_log = global_var.get_value('biz_log')
-    biz_log.info('juejin_spider start....')
-    # try:
-    #     serial_id = common.generate_serial_id(target_site_name)
-    #     start_cursor = '0'
-    #     list_task(serial_id, list_url, start_cursor)
-    # except Exception as e:
-    #     biz_log.error(e)
+    biz_log.info('juejin_spider start......')
+    try:
+        serial_id = common.generate_serial_id(target_site_name)
+        start_cursor = '0'
+        list_task(serial_id, list_url, start_cursor)
+    except Exception as e:
+        biz_log.error(e)
 
 
 def list_task(serial_id, url, cursor):
@@ -126,9 +126,10 @@ def detail_task_execute(execute_params):
     if content != '':
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
     # 保存到数据库中
-    article_service.saveArticle(Article(url, json.dumps({
+    save_result = article_service.saveArticle(Article(url, json.dumps({
         'url': url,
         'title': title,
         'content': content_html,
         'published_time': published_time
     }, ensure_ascii=False), "JUEJIN"))
+    biz_log.info('save article, url=%s, result=%s', url, save_result)

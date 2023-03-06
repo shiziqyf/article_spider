@@ -6,6 +6,8 @@ def saveArticle(article: Article):
     oldArticle = ArticleDAO.queryOneByArticleUrl(article.source_url)
     if oldArticle is None:
         ArticleDAO.insert(article)
+        return True
+    return False
     # else:
     #     ArticleDAO.
 

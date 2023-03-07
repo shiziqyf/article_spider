@@ -18,8 +18,6 @@ list_repeat_keep_time = 14400000  # 4小时
 # list_repeat_keep_time = 1000  # 1秒
 detail_repeat_keep_time = -1  # 永久
 
-first = True
-
 
 def req_post_json(url, json_body):
     response = requests.post(url=url, json=json_body)
@@ -36,14 +34,20 @@ def list_first(lis):
     return lis[0] if lis else ""
 
 
+is_first = None
+
+
 def juejin_spider_start():
     biz_log = global_var.get_value('biz_log')
     biz_log.info('juejin_spider start......')
     model = 'INCREMENTAL'
-    global first
-    if first:
+    global is_first
+    if is_first is None:
+        is_first = global_var.get_value('is_first')
+
+    if is_first:
         model = 'FULL'
-        first = False
+        is_first = False
     try:
         serial_id = common.generate_serial_id(target_site_name)
         start_cursor = '0'

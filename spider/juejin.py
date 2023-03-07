@@ -135,7 +135,8 @@ def detail_task_execute(task_id, execute_params):
     content = list_first(content_s)
     if len(content) < 1:
         biz_log.error("juejin detail content is blank, task_id=%s", task_id)
-        return
+        biz_log.info("resp_data_text = %s", resp_data_text)
+        raise Exception('juejin detail content is blank')
     published_time = list_first(published_time_s)
     content_html = ''
     if content != '':

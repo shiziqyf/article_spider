@@ -5,6 +5,7 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import global_var
+from dao.mysqlConn import MysqlConnUtil
 from log.logger_handler import LoggerHandler
 from spider import task_dispatch, juejin
 
@@ -17,15 +18,18 @@ def init_config(args):
     os.environ["INCLUDES_FOR_DYNACONF"] = "['{}']".format(config_file_name)
 
 
-def test_job():
-    print("test_job")
-
-
-if __name__ == '__main__':
+# 初始化必要资源
+def init_resource():
     # init config
     init_config(sys.argv)
     # init log module
     LoggerHandler.init_log()
+    # init mysql conn pool
+    MysqlConnUtil.init_pool()
+
+
+if __name__ == '__main__':
+    init_resource()
 
     biz_log = global_var.get_value('biz_log')
 

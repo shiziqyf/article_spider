@@ -39,15 +39,20 @@ def list_first(lis):
 def juejin_spider_start():
     biz_log = global_var.get_value('biz_log')
     biz_log.info('juejin_spider start......')
+    model = 'INCREMENTAL'
+    global first
+    if first:
+        model = 'FULL'
+        first = False
     try:
         serial_id = common.generate_serial_id(target_site_name)
         start_cursor = '0'
-        list_task(serial_id, list_url, start_cursor)
+        list_task(serial_id, list_url, start_cursor, model)
     except Exception as e:
         biz_log.error(e)
 
 
-def list_task(serial_id, url, cursor):
+def list_task(serial_id, url, cursor, model):
     req_params = {
         "sort_type": 300,
         "cursor": cursor,
@@ -55,11 +60,7 @@ def list_task(serial_id, url, cursor):
         "id_type": 2,
         "client_type": 2608
     }
-    model = 'INCREMENTAL'
-    global first
-    if first:
-        model = 'FULL'
-        first = False
+
     now_time = common.get_current_time()
     repeat_expire_time = now_time + list_repeat_keep_time
     task_id = common.generate_task_id(target_site_name, url, req_params, list_version)
@@ -112,9 +113,9 @@ def page_task_execute(task_id, execute_params):
     biz_log.info('need_continue_list = %s', need_continue_list)
     # if next_cursor
     if model == 'FULL':
-        list_task(serial_id, list_url, next_cursor)
+        list_task(serial_id, list_url, next_cursor, model)
     elif need_continue_list:
-        list_task(serial_id, list_url, next_cursor)
+        list_task(serial_id, list_url, next_cursor, model)
 
 
 def detail_task_execute(task_id, execute_params):

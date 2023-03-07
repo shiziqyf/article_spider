@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # task_dispatch.start_with_new_thread()
     schedule = BackgroundScheduler()
     juejin.juejin_spider_start()
-    schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=1)
+    schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)
     schedule.start()
     while True:
         biz_log.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))

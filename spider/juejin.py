@@ -18,6 +18,8 @@ list_repeat_keep_time = 14400000  # 4小时
 # list_repeat_keep_time = 1000  # 1秒
 detail_repeat_keep_time = -1  # 永久
 
+first = True
+
 
 def req_post_json(url, json_body):
     response = requests.post(url=url, json=json_body)
@@ -53,6 +55,11 @@ def list_task(serial_id, url, cursor):
         "id_type": 2,
         "client_type": 2608
     }
+    model = 'INCREMENTAL'
+    global first
+    if first:
+        model = 'FULL'
+        first = False
     now_time = common.get_current_time()
     repeat_expire_time = now_time + list_repeat_keep_time
     task_id = common.generate_task_id(target_site_name, url, req_params, list_version)
@@ -60,7 +67,7 @@ def list_task(serial_id, url, cursor):
         "url": url,
         "req_params": req_params,
         "serial_id": serial_id,
-        "model": "INCREMENTAL"
+        "model": model
     }
     task = Task(identifies=task_id, name="juejin_list", status=0, module_name=model_name, execute_func_name="page_task_execute",
                 task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=task_execute_func_params, created_time=now_time)

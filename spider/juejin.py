@@ -51,12 +51,12 @@ def juejin_spider_start():
     try:
         serial_id = common.generate_serial_id(target_site_name)
         start_cursor = '0'
-        list_task(serial_id, list_url, start_cursor, model)
+        list_task(serial_id, list_url, start_cursor, model, None)
     except Exception as e:
         biz_log.error(e)
 
 
-def list_task(serial_id, url, cursor, model):
+def list_task(serial_id, url, cursor, model, parent_task_id):
     req_params = {
         "sort_type": 300,
         "cursor": cursor,
@@ -67,15 +67,15 @@ def list_task(serial_id, url, cursor, model):
 
     now_time = common.get_current_time()
     repeat_expire_time = now_time + list_repeat_keep_time
-    task_id = common.generate_task_id(target_site_name, url, req_params, list_version)
+    identifies = common.generate_task_id(target_site_name, url, req_params, list_version)
     task_execute_func_params = {
         "url": url,
         "req_params": req_params,
         "serial_id": serial_id,
         "model": model
     }
-    task = Task(identifies=task_id, name="juejin_list", status=0, module_name=model_name, execute_func_name="page_task_execute",
-                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, params=task_execute_func_params, created_time=now_time)
+    task = Task(identifies=identifies, name="juejin_list", status=0, module_name=model_name, execute_func_name="page_task_execute",
+                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, valid_status=1, parent_task_id=parent_task_id, params=task_execute_func_params, created_time=now_time)
     task_service.save_task(task)
 
 
@@ -103,13 +103,13 @@ def page_task_execute(task_id, execute_params):
         detail_url = "https://juejin.cn/post/" + article_id
 
         now_time = common.get_current_time()
-        task_id = common.generate_task_id(target_site_name, detail_url, article_id, detail_version)
+        detail_task_id = common.generate_task_id(target_site_name, detail_url, article_id, detail_version)
         task_execute_func_params = {
             "url": detail_url,
             'serial_id': serial_id
         }
-        task = Task(identifies=task_id, name="juejin_detail", status=0, module_name=model_name, execute_func_name="detail_task_execute",
-                    task_type=None, serial_id=serial_id, repeat_expire_time=detail_repeat_keep_time, priority=2, params=task_execute_func_params, created_time=now_time)
+        task = Task(identifies=detail_task_id, name="juejin_detail", status=0, module_name=model_name, execute_func_name="detail_task_execute",
+                    task_type=None, serial_id=serial_id, repeat_expire_time=detail_repeat_keep_time, priority=2, valid_status=1, parent_task_id=task_id, params=task_execute_func_params, created_time=now_time)
         save_result = task_service.save_task(task)
         has_no_repeat_task = save_result["not_repeat"]
         if has_no_repeat_task:
@@ -117,9 +117,9 @@ def page_task_execute(task_id, execute_params):
     biz_log.info('need_continue_list = %s', need_continue_list)
     # if next_cursor
     if model == 'FULL':
-        list_task(serial_id, list_url, next_cursor, model)
+        list_task(serial_id, list_url, next_cursor, model, task_id)
     elif need_continue_list:
-        list_task(serial_id, list_url, next_cursor, model)
+        list_task(serial_id, list_url, next_cursor, model, task_id)
 
 
 def detail_task_execute(task_id, execute_params):
@@ -147,5 +147,5 @@ def detail_task_execute(task_id, execute_params):
         'title': title,
         'content': content_html,
         'published_time': published_time
-    }, ensure_ascii=False), "JUEJIN"))
+    }, ensure_ascii=False), "JUEJIN", from_task_id=task_id))
     biz_log.info('save article, url=%s, result=%s', url, save_result)

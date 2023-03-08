@@ -8,10 +8,10 @@ class ArticleDAO:
         conn = None
         cursor = None
         try:
-            sql = 'insert into article_resource(source, source_url, content_pack, content_format, transform_status) values (%s,%s, %s, %s, %s)'
+            sql = 'insert into article_resource(source, source_url, content_pack, content_format, transform_status, from_task_id) values (%s,%s, %s, %s, %s, %s)'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql, (article.source, article.source_url, article.content_pack, "HTML", "INIT"))
+            cursor.execute(sql, (article.source, article.source_url, article.content_pack, "HTML", "INIT", article.from_task_id))
             conn.commit()
         except Exception as e:
             raise e

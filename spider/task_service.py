@@ -6,7 +6,8 @@ from spider import common
 def save_task(task: Task):
     result = {}
     not_repeat = True
-    oldTask = TaskDAO.queryOneByIdentifies(task.identifies)
+    # oldTask = TaskDAO.queryOneByIdentifies(task.identifies)
+    oldTask = TaskDAO.queryOneByIdentifiesAndValid(task.identifies, 1)
     if oldTask is None:
         TaskDAO.insert(task)
         not_repeat = True
@@ -20,7 +21,9 @@ def save_task(task: Task):
                 # 任务重复时间还没过期
                 not_repeat = False
             else:
-                TaskDAO.updatedById(oldTask.id, task)
+                updated_task = Task(valid_status=0)
+                TaskDAO.updatedById(oldTask.id, updated_task)
+                TaskDAO.insert(task)
                 not_repeat = True
 
     result["not_repeat"] = not_repeat

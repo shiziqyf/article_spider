@@ -1,6 +1,6 @@
 class Task:
     def __init__(self, id=None, identifies=None, name=None, status=None, module_name=None, execute_func_name=None,
-                 task_type=None, serial_id=None, repeat_expire_time=None, priority=None, params=None, created_time=None, gmt_created_time=None, gmt_updated_time=None):
+                 task_type=None, serial_id=None, repeat_expire_time=None, priority=None, params=None, created_time=None, valid_status=None, parent_task_id=None, gmt_created_time=None, gmt_updated_time=None):
         self.id = id
         self.identifies = identifies
         self.name = name
@@ -15,6 +15,8 @@ class Task:
         self.priority = priority
         self.gmt_created_time = gmt_created_time
         self.gmt_updated_time = gmt_updated_time
+        self.valid_status = valid_status
+        self.parent_task_id = parent_task_id
 
 #
 #

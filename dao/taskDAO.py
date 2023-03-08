@@ -8,12 +8,12 @@ class TaskDAO:
         conn = None
         cursor = None
         try:
-            sql = 'insert into spider_task(identifies, name, status, module_name, execute_func_name, params, task_type, serial_id, repeat_expire_time, priority, created_time) ' \
-                  'values (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            sql = 'insert into spider_task(identifies, name, status, module_name, execute_func_name, params, task_type, serial_id, valid_status, parent_task_id, repeat_expire_time, priority, created_time) ' \
+                  'values (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, (task.identifies, task.name, task.status, task.module_name, task.execute_func_name, str(task.params),
-                                 task.task_type, task.serial_id, task.repeat_expire_time, task.priority, task.created_time))
+                                 task.task_type, task.serial_id, task.valid_status, task.parent_task_id, task.repeat_expire_time, task.priority, task.created_time))
             conn.commit()
         except Exception as e:
             raise e
@@ -29,6 +29,22 @@ class TaskDAO:
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, identifies)
+            result = cursor.fetchone()
+            return TaskDAO.resultToTask(cursor, result)
+        except Exception as e:
+            raise e
+        finally:
+            MysqlConnUtil.closeResource(cursor, conn)
+
+    @staticmethod
+    def queryOneByIdentifiesAndValid(identifies, valid_status) -> Task:
+        conn = None
+        cursor = None
+        try:
+            sql = 'select * from spider_task where identifies = %s and valid_status = %s order by gmt_created_time desc limit 1'
+            conn = MysqlConnUtil.getConn()
+            cursor = conn.cursor()
+            cursor.execute(sql, (identifies, valid_status))
             result = cursor.fetchone()
             return TaskDAO.resultToTask(cursor, result)
         except Exception as e:

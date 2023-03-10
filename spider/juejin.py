@@ -141,6 +141,7 @@ def detail_task_execute(task_id, execute_params):
     content_html = ''
     if content != '':
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
+    biz_log.info('juejin_detail fetch finish, url=%s, task_id=%s', url, task_id)
     # 保存到数据库中
     save_result = article_service.saveArticle(Article(url, json.dumps({
         'url': url,

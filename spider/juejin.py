@@ -8,7 +8,8 @@ import global_var
 from dao.articleDAO import ArticleDAO
 from dao.model.article import Article
 from dao.model.task import Task
-from spider import common, article_service, task_service, image
+from spider import common, image
+from spider.server import task_service, article_service
 
 model_name = 'spider.juejin'
 target_site_name = 'juejin'

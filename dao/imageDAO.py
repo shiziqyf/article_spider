@@ -21,11 +21,11 @@ class ImageDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryOneUrl(url: str) -> ImageResource:
+    def queryOneByUrl(url: str) -> ImageResource:
         conn = None
         cursor = None
         try:
-            sql = 'select * from  article_resource where url = %s'
+            sql = 'select id, url, oss_key, from_task_id, from_article_resource_id from  image_resource where url = %s'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, url)

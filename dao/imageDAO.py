@@ -1,18 +1,17 @@
-from dao.model.article import Article
+from dao.model.image_resource import ImageResource
 from dao.mysqlConn import MysqlConnUtil
 
 
-class ArticleDAO:
+class ImageDAO:
     @staticmethod
-    def insert(article: Article):
+    def insert(image: ImageResource):
         conn = None
         cursor = None
         try:
-            sql = 'insert into article_resource(source, source_url, content_pack, content_format, transform_status, from_task_id, img_deal_status) ' \
-                  'values (%s, %s, %s, %s, %s, %s, %s)'
+            sql = 'insert into image_resource(url, oss_key, from_task_id, from_article_resource_id) values (%s, %s, %s, %s)'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql, (article.source, article.source_url, article.content_pack, "HTML", "INIT", article.from_task_id, article.img_deal_status))
+            cursor.execute(sql, (image.url, image.oss_key, image.from_task_id, image.from_article_resource_id))
             last_id = cursor.lastrowid
             conn.commit()
             return last_id
@@ -22,30 +21,29 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryOneByArticleUrl(url: str) -> Article:
+    def queryOneUrl(url: str) -> ImageResource:
         conn = None
         cursor = None
         try:
-            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status ' \
-                  'from  article_resource where source_url = %s'
+            sql = 'select * from  article_resource where url = %s'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, url)
             result = cursor.fetchone()
             MysqlConnUtil.closeResource(cursor, conn)
-            return ArticleDAO.resultToArticle(cursor, result)
+            return ImageDAO.resultToImage(cursor, result)
         except Exception as e:
             raise e
         finally:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def updatedById(id, article):
+    def updatedById(id, image):
         conn = None
         cursor = None
         try:
-            sql = 'update article_resource set'
-            sql_part, params = ArticleDAO.generate_updated_sql(article)
+            sql = 'update image_resource set'
+            sql_part, params = ImageDAO.generate_updated_sql(image)
             if params is None or len(params) == 0:
                 return
             sql = sql + sql_part + ' where id=%s limit 1'
@@ -60,10 +58,10 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def generate_updated_sql(article: Article):
+    def generate_updated_sql(image: ImageResource):
         sql = ''
         params = []
-        property_map = article.__dict__
+        property_map = image.__dict__
         first = True
         for key in property_map:
             value = property_map[key]
@@ -78,13 +76,13 @@ class ArticleDAO:
         return sql, params
 
     @staticmethod
-    def resultToArticle(cursor, result):
+    def resultToImage(cursor, result):
         if result is None:
             return None
         i = 0
-        article_dirt = {}
+        image_dirt = {}
         for item in result:
             title = cursor.description[i][0]
-            article_dirt[title] = item
+            image_dirt[title] = item
             i = i + 1
-        return Article(**article_dirt)
+        return ImageResource(**image_dirt)

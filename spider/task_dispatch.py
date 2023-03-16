@@ -53,7 +53,7 @@ def start_article():
 
 def start_img():
     while True:
-        time.sleep(1)
+        time.sleep(0.5)
         start_task('IMG')
 
 

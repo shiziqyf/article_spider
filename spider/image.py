@@ -1,5 +1,8 @@
 import re
 
+import global_var
+from dao.imageDAO import ImageDAO
+from dao.model.image_resource import ImageResource
 from dao.model.task import Task
 from spider import task_service, common
 
@@ -24,4 +27,11 @@ def generate_img_task_from_html(parent_task_id, serial_id, article_resource_id, 
 
 
 def img_task_execute(task_id, execute_params):
-    print("img_task_execute params=", str(execute_params))
+    biz_log = global_var.get_value('biz_log')
+    biz_log.info('img_task_execute, task_id=%s', task_id)
+    img_url = execute_params['img_url']
+    # TODO 上传到oss
+    article_resource_id = execute_params['article_resource_id']
+    image = ImageResource(url=img_url, oss_key='', from_task_id=task_id, from_article_resource_id=article_resource_id)
+    ImageDAO.insert(image)
+    biz_log.info('img_task_execute finish, url=%s, task_id=%s', img_url, task_id)

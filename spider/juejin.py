@@ -5,6 +5,7 @@ from lxml import etree
 from lxml.html import tostring
 
 import global_var
+from dao.articleDAO import ArticleDAO
 from dao.model.article import Article
 from dao.model.task import Task
 from spider import common, article_service, task_service, image
@@ -144,15 +145,15 @@ def detail_task_execute(task_id, execute_params):
         content_html = tostring(content, encoding="utf-8").decode("utf-8")
     biz_log.info('juejin_detail fetch finish, url=%s, task_id=%s', url, task_id)
     # 保存到数据库中
-    save_result = article_service.saveArticle(Article(url, json.dumps({
+    article_id = article_service.saveArticle(Article(source_url=url, content_pack=json.dumps({
         'url': url,
         'title': title,
         'content': content_html,
         'published_time': published_time
-    }, ensure_ascii=False), "JUEJIN", from_task_id=task_id, img_deal_status=-1))
-    biz_log.info('save article, url=%s, result=%s', url, save_result)
+    }, ensure_ascii=False), source="JUEJIN", from_task_id=task_id, img_deal_status=-1))
+    biz_log.info('save article, url=%s, article_id=%s', url, article_id)
     try:
-        image.generate_img_task_from_html(task_id, serial_id, 1, content_html)
-        # ArticleDAO.updatedById()
+        image.generate_img_task_from_html(task_id, serial_id, article_id, content_html)
+        ArticleDAO.updatedById(article_id, Article(img_deal_status=0))
     except Exception as e:
         biz_log.error("generate_img_task fail", e)

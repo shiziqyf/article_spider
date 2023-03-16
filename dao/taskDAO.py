@@ -73,14 +73,14 @@ class TaskDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryEarliestTask():
+    def queryEarliestTaskByType(task_type):
         conn = None
         cursor = None
         try:
-            sql = 'select * from spider_task where status = 0 order by priority desc, created_time asc limit 1'
+            sql = 'select * from spider_task where status = 0 and task_type = %s order by priority desc, created_time asc limit 1'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql)
+            cursor.execute(sql, task_type)
             result = cursor.fetchone()
             return TaskDAO.resultToTask(cursor, result)
         except Exception as e:

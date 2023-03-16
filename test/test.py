@@ -1,28 +1,19 @@
-from reflect_test import show1
-import time
+import ssl
 
-import schedule as schedule
+import requests
+
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 
-def job():
-    print("do job......")
+def urllib_download(url):
+    headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
+    r = requests.get(url, headers=headers, stream=True)
+    print(r.status_code)  # 返回状态码
+    if r.status_code == 200:
+        open('img.png', 'wb').write(r.content)  # 将内容写入图片
+        print("done")
+    del r
 
 
 if __name__ == '__main__':
-    # log = LoggerHandler("test.log").log
-    # log2 = LoggerHandler("test2.log", True).log
-    # # log.debug("dddds22231233")Î
-    # log2.warning("123")
-    # imp = input("模块名:")
-    # CC = __import__(imp, fromlist=True)
-    # print("cc = ", CC)
-    # inp_func = input("请输入要执行的函数：")
-    # print("func = ", inp_func)
-    # f = getattr(CC, inp_func, None)
-    # f(11)
-    # show1.show(123)
-    schedule.every(10).seconds.do(job)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-        print("schedule....")
+    urllib_download("https://s2.loli.net/2023/03/05/qigmFrL4U7I5WbA.png")

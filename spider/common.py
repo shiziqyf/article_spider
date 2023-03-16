@@ -15,3 +15,4 @@ def generate_serial_id(target_site_name):
 
 def get_current_time():
     return int(round(time.time() * 1000))
+

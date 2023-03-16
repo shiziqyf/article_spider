@@ -4,10 +4,11 @@ from dao.articleDAO import ArticleDAO
 
 def saveArticle(article: Article):
     oldArticle = ArticleDAO.queryOneByArticleUrl(article.source_url)
+    id = ''
     if oldArticle is None:
-        ArticleDAO.insert(article)
+        id = ArticleDAO.insert(article)
         return True
-    return False
+    return oldArticle.id
     # else:
     #     ArticleDAO.
 

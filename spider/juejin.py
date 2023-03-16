@@ -7,7 +7,7 @@ from lxml.html import tostring
 import global_var
 from dao.model.article import Article
 from dao.model.task import Task
-from spider import common, article_service, task_service
+from spider import common, article_service, task_service, image
 
 model_name = 'spider.juejin'
 target_site_name = 'juejin'
@@ -75,7 +75,7 @@ def list_task(serial_id, url, cursor, model, parent_task_id):
         "model": model
     }
     task = Task(identifies=identifies, name="juejin_list", status=0, module_name=model_name, execute_func_name="page_task_execute",
-                task_type=None, serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, valid_status=1, parent_task_id=parent_task_id, params=task_execute_func_params, created_time=now_time)
+                task_type="ARTICLE", serial_id=serial_id, repeat_expire_time=repeat_expire_time, priority=1, valid_status=1, parent_task_id=parent_task_id, params=task_execute_func_params, created_time=now_time)
     task_service.save_task(task)
 
 
@@ -109,7 +109,7 @@ def page_task_execute(task_id, execute_params):
             'serial_id': serial_id
         }
         task = Task(identifies=detail_task_id, name="juejin_detail", status=0, module_name=model_name, execute_func_name="detail_task_execute",
-                    task_type=None, serial_id=serial_id, repeat_expire_time=detail_repeat_keep_time, priority=2, valid_status=1, parent_task_id=task_id, params=task_execute_func_params, created_time=now_time)
+                    task_type="ARTICLE", serial_id=serial_id, repeat_expire_time=detail_repeat_keep_time, priority=2, valid_status=1, parent_task_id=task_id, params=task_execute_func_params, created_time=now_time)
         save_result = task_service.save_task(task)
         has_no_repeat_task = save_result["not_repeat"]
         if has_no_repeat_task:
@@ -125,6 +125,7 @@ def page_task_execute(task_id, execute_params):
 def detail_task_execute(task_id, execute_params):
     biz_log = global_var.get_value('biz_log')
     url = execute_params['url']
+    serial_id = execute_params['serial_id']
     biz_log.info('juejin_detail_task_execute, url=%s, task_id=%s', url, task_id)
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
@@ -148,5 +149,10 @@ def detail_task_execute(task_id, execute_params):
         'title': title,
         'content': content_html,
         'published_time': published_time
-    }, ensure_ascii=False), "JUEJIN", from_task_id=task_id))
+    }, ensure_ascii=False), "JUEJIN", from_task_id=task_id, img_deal_status=-1))
     biz_log.info('save article, url=%s, result=%s', url, save_result)
+    try:
+        image.generate_img_task_from_html(task_id, serial_id, 1, content_html)
+        # ArticleDAO.updatedById()
+    except Exception as e:
+        biz_log.error("generate_img_task fail", e)

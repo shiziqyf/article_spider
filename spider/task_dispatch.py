@@ -7,9 +7,9 @@ from dao.taskDAO import TaskDAO
 import threading
 
 
-def start_one():
+def start_task(task_type):
     # 获取最早的优先级最高的任务
-    task = TaskDAO.queryEarliestTask()
+    task = TaskDAO.queryEarliestTaskByType(task_type)
     if task is None:
         return
     execute_task(task)
@@ -45,13 +45,29 @@ def execute_task(task: Task):
     TaskDAO.updatedById(task_id=task.id, task=update_task)
 
 
-def start():
+def start_article():
     while True:
         time.sleep(1)
-        start_one()
+        start_task('ARTICLE')
 
 
-def start_with_new_thread():
-    thread = threading.Thread(target=start)
+def start_img():
+    while True:
+        time.sleep(1)
+        start_task('IMG')
+
+
+def start_article_with_new_thread():
+    biz_log = global_var.get_value('biz_log')
+    biz_log.info('start_article_with_new_thread......')
+    thread = threading.Thread(target=start_article)
+    thread.daemon = True
+    thread.start()
+
+
+def start_img_with_new_thread():
+    biz_log = global_var.get_value('biz_log')
+    biz_log.info('start_img_with_new_thread......')
+    thread = threading.Thread(target=start_img)
     thread.daemon = True
     thread.start()

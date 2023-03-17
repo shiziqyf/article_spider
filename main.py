@@ -37,8 +37,8 @@ if __name__ == '__main__':
     biz_log = global_var.get_value('biz_log')
 
     # 任务调度启动
-    task_dispatch.start_article_with_new_thread()
-    # task_dispatch.start_img_with_new_thread()
+    # task_dispatch.start_article_with_new_thread()
+    task_dispatch.start_img_with_new_thread()
     schedule = BackgroundScheduler()
     juejin.juejin_spider_start()
     schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)

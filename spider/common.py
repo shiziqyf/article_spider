@@ -1,6 +1,7 @@
 import hashlib
 import time
 import random
+from datetime import datetime
 
 
 def generate_task_id(site_name, url, params, version):
@@ -13,6 +14,14 @@ def generate_serial_id(target_site_name):
     return str(target_site_name) + "_" + str(current_time) + "_" + str(random.randint(0, 1000))
 
 
+def generate_random_id(nonce=''):
+    current_time = int(round(time.time() * 1000))
+    return str(nonce) + "_" + str(current_time) + "_" + str(random.randint(0, 1000))
+
+
 def get_current_time():
     return int(round(time.time() * 1000))
 
+
+def get_today_time():
+    return time.strftime('%Y-%m-%d', time.localtime())

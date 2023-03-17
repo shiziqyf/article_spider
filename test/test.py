@@ -1,3 +1,4 @@
+import os
 import ssl
 
 import requests
@@ -10,7 +11,10 @@ def urllib_download(url):
     r = requests.get(url, headers=headers, stream=True)
     print(r.status_code)  # 返回状态码
     if r.status_code == 200:
-        open('img.png', 'wb').write(r.content)  # 将内容写入图片
+        folder_path = '/Users/developer/Desktop/cache/img'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        open(folder_path + '/test', 'wb').write(r.content)  # 将内容写入图片
         print("done")
     del r
 

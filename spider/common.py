@@ -1,7 +1,6 @@
 import hashlib
 import time
 import random
-from datetime import datetime
 
 
 def generate_task_id(site_name, url, params, version):
@@ -23,5 +22,5 @@ def get_current_time():
     return int(round(time.time() * 1000))
 
 
-def get_today_time():
+def get_today_time_str():
     return time.strftime('%Y-%m-%d', time.localtime())

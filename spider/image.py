@@ -1,4 +1,3 @@
-import os
 import re
 
 import requests
@@ -9,13 +8,13 @@ from dao.imageDAO import ImageDAO
 from dao.model.image_resource import ImageResource
 from dao.model.task import Task
 from spider import common
-from spider.server import task_service, image_service, oss_service
+from spider.server import task_service, image_service, oss_service, article_service
 
 model_name = 'spider.image'
 
 
 def generate_img_task_from_html(parent_task_id, serial_id, article_resource_id, html_str):
-    img_urls = re.findall('img src="(.*?)"', html_str, re.S)
+    img_urls = article_service.get_img_urls_from_html(html_str)
 
     if len(img_urls) > 0:
         for img_url in img_urls:
@@ -68,5 +67,3 @@ def upload_image_to_oss_from_url(url):
         biz_log.error('download_img_from_url fail, url=%s, resp_code=%s, resp_text=%s', url, str(resp.status_code), str(resp.text))
         del resp
         raise Exception('download_img_from_url fail, url=' + url)
-
-

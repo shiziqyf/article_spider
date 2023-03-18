@@ -40,6 +40,24 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
+    def queryEarliestByImgDealStatus(img_deal_status) -> Article:
+        conn = None
+        cursor = None
+        try:
+            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status ' \
+                  'from  article_resource where img_deal_status = %s order by gmt_created_time asc'
+            conn = MysqlConnUtil.getConn()
+            cursor = conn.cursor()
+            cursor.execute(sql, img_deal_status)
+            result = cursor.fetchone()
+            MysqlConnUtil.closeResource(cursor, conn)
+            return ArticleDAO.resultToArticle(cursor, result)
+        except Exception as e:
+            raise e
+        finally:
+            MysqlConnUtil.closeResource(cursor, conn)
+
+    @staticmethod
     def updatedById(id, article):
         conn = None
         cursor = None

@@ -8,6 +8,7 @@ import global_var
 from dao.mysqlConn import MysqlConnUtil
 from log.logger_handler import LoggerHandler
 from spider import task_dispatch, juejin
+from spider.server import article_service
 
 
 def init_config(args):
@@ -38,11 +39,12 @@ if __name__ == '__main__':
 
     # 任务调度启动
     # task_dispatch.start_article_with_new_thread()
-    task_dispatch.start_img_with_new_thread()
-    schedule = BackgroundScheduler()
-    juejin.juejin_spider_start()
-    schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)
-    schedule.start()
-    while True:
-        biz_log.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-        time.sleep(1000)
+    # task_dispatch.start_img_with_new_thread()
+    # schedule = BackgroundScheduler()
+    # juejin.juejin_spider_start()
+    # schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)
+    # schedule.start()
+    # while True:
+    #     biz_log.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+    #     time.sleep(1000)
+    article_service.verify_img_deal()

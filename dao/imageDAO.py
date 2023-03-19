@@ -38,21 +38,20 @@ class ImageDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryByUrls(urls) -> ImageResource:
+    def queryByUrls(urls):
         if urls is None or len(urls) == 0:
             return None
         urls_str = ','.join(['%s'] * len(urls))
-        print(urls_str)
         conn = None
         cursor = None
         try:
-            sql = 'select id, url, oss_key, from_task_id, from_article_resource_id from  image_resource where url in %s'
+            sql = 'select id, url, oss_key, from_task_id, from_article_resource_id from  image_resource where url in (%s)' % urls_str
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql, urls_str)
-            result = cursor.fetchall
+            cursor.execute(sql, urls)
+            results = cursor.fetchall()
             MysqlConnUtil.closeResource(cursor, conn)
-            return ImageDAO.resultToImage(cursor, result)
+            return ImageDAO.resultToImageList(cursor, results)
         except Exception as e:
             raise e
         finally:
@@ -109,13 +108,17 @@ class ImageDAO:
         return ImageResource(**image_dirt)
 
     @staticmethod
-    def resultToImageList(cursor, result):
-        if result is None:
+    def resultToImageList(cursor, results):
+        if results is None:
             return None
-        i = 0
-        image_dirt = {}
-        for item in result:
-            title = cursor.description[i][0]
-            image_dirt[title] = item
-            i = i + 1
-        return ImageResource(**image_dirt)
+        image_resource_list = []
+        for result in results:
+            i = 0
+            image_dirt = {}
+            for item in result:
+                title = cursor.description[i][0]
+                image_dirt[title] = item
+                i = i + 1
+            image_resource_list.append(ImageResource(**image_dirt))
+        return image_resource_list
+

@@ -45,7 +45,6 @@ def img_task_execute(task_id, execute_params):
         article_resource_id = execute_params['article_resource_id']
         image = ImageResource(url=img_url, oss_key=oss_key, from_task_id=task_id, from_article_resource_id=article_resource_id)
         image_service.save_image(image)
-    print(need_upload_oss)
     biz_log.info('img_task_execute finish, url=%s, task_id=%s', img_url, task_id)
 
 

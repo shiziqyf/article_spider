@@ -22,15 +22,4 @@ def get_img_urls_from_html(html_str):
 
 
 # 检查 article 图片是否处理完成
-def verify_img_deal():
-    print("ddsfdsfsdf")
-    article = ArticleDAO.queryEarliestByImgDealStatus(0)
-    if article is None:
-        return
-    content_dirt = json.loads(article.content_pack)
-    urls = get_img_urls_from_html(content_dirt['content'])
-    if urls is None or len(urls) == 0:
-        # TODO 更新
-        return
-    ImageDAO.queryByUrls(urls)
 

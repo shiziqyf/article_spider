@@ -32,7 +32,7 @@ def verify_img_deal_timing():
             continue
         earliest_time = article.gmt_created_time
         verify_article_img_deal(article)
-        time.sleep(1)
+        time.sleep(0.1)
 
 
 def generate_img_task():

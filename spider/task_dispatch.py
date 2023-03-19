@@ -46,15 +46,23 @@ def execute_task(task: Task):
 
 
 def start_article():
+    biz_log = global_var.get_value('biz_log')
     while True:
-        time.sleep(1)
-        start_task('ARTICLE')
+        try:
+            time.sleep(1)
+            start_task('ARTICLE')
+        except Exception:
+            biz_log.error('start article task fail, err=%s', traceback.format_exc())
 
 
 def start_img():
+    biz_log = global_var.get_value('biz_log')
     while True:
-        time.sleep(0.5)
-        start_task('IMG')
+        try:
+            time.sleep(0.5)
+            start_task('IMG')
+        except Exception:
+            biz_log.error('start img task fail, err=%s', traceback.format_exc())
 
 
 def start_article_with_new_thread():

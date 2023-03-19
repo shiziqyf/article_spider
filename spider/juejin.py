@@ -132,13 +132,13 @@ def detail_task_execute(task_id, execute_params):
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
     title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
-    content_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[4]/div')
+    content_s = root.xpath('//*[@id="juejin"]//div[contains(@class,"article-content")][1]')
     published_time_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[3]/div/div[2]/time/text()')
     title = list_first(title_s)
     content = list_first(content_s)
     if len(content) < 1:
         biz_log.error("juejin detail content is blank, task_id=%s", task_id)
-        biz_log.info("resp_data_text = %s", resp_data_text)
+        # biz_log.info("resp_data_text = %s", resp_data_text)
         raise Exception('juejin detail content is blank')
     published_time = list_first(published_time_s)
     content_html = ''

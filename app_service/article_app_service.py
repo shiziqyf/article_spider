@@ -23,34 +23,35 @@ def verify_article_img_deal(article):
 
 
 def verify_img_deal_timing():
-    earliest_time = 0
+
+    earliest_id = 0
     while True:
-        article = ArticleDAO.queryEarliestByImgDealStatus(0, earliest_time)
+        article = ArticleDAO.queryEarliestByImgDealStatus(0, earliest_id)
         if article is None:
-            earliest_time = 0
+            earliest_id = 0
             time.sleep(10)
             continue
-        earliest_time = article.gmt_created_time
+        earliest_id = article.id
         verify_article_img_deal(article)
         time.sleep(0.1)
 
 
-def generate_img_task():
-    while True:
-        article = ArticleDAO.queryEarliestByImgDealStatus(-1, 0)
-        if article is None:
-            time.sleep(10)
-            continue
-        content_dirt = json.loads(article.content_pack)
-        content_html_str = content_dirt['content']
-        generate_img_task_from_html(None, '', article.id, content_html_str)
-        ArticleDAO.updatedById(article.id, Article(img_deal_status=0))
+# def generate_img_task():
+#     while True:
+#         article = ArticleDAO.queryEarliestByImgDealStatus(-1, 0)
+#         if article is None:
+#             time.sleep(10)
+#             continue
+#         content_dirt = json.loads(article.content_pack)
+#         content_html_str = content_dirt['content']
+#         generate_img_task_from_html(None, '', article.id, content_html_str)
+#         ArticleDAO.updatedById(article.id, Article(img_deal_status=0))
 
 
 def start_verify_img_deal_new_thread():
     thread_deal = threading.Thread(target=verify_img_deal_timing)
-    thread_generate = threading.Thread(target=generate_img_task)
+    # thread_generate = threading.Thread(target=generate_img_task)
     thread_deal.daemon = True
-    thread_generate.daemon = True
+    # thread_generate.daemon = True
     thread_deal.start()
-    thread_generate.start()
+    # thread_generate.start()

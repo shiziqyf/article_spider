@@ -40,15 +40,15 @@ class ArticleDAO:
             MysqlConnUtil.closeResource(cursor, conn)
 
     @staticmethod
-    def queryEarliestByImgDealStatus(img_deal_status, earliest_time) -> Article:
+    def queryEarliestByImgDealStatus(img_deal_status, id) -> Article:
         conn = None
         cursor = None
         try:
             sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status, gmt_created_time ' \
-                  'from  article_resource where img_deal_status = %s and gmt_created_time > %s order by gmt_created_time asc limit 1'
+                  'from  article_resource where img_deal_status = %s and id > %s order by id asc limit 1'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
-            cursor.execute(sql, (img_deal_status, earliest_time))
+            cursor.execute(sql, (img_deal_status, id))
             result = cursor.fetchone()
             MysqlConnUtil.closeResource(cursor, conn)
             return ArticleDAO.resultToArticle(cursor, result)

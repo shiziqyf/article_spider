@@ -79,7 +79,7 @@ def start_img_with_new_thread():
     biz_log = global_var.get_value('biz_log')
     biz_log.info('start_img_with_new_thread......')
     schedule = BackgroundScheduler()
-    schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=2)
+    schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=1)
     schedule.start()
 
     # thread = threading.Thread(target=start_img)

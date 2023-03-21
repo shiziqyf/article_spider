@@ -48,10 +48,10 @@ if __name__ == '__main__':
     biz_log = global_var.get_value('biz_log')
 
     # 任务调度启动
-    task_dispatch.start_article_with_new_thread()
+    # task_dispatch.start_article_with_new_thread()
     task_dispatch.start_img_with_new_thread()
-    article_app_service.start_verify_img_deal_new_thread()
-    juejin_spider_schedule()
+    # article_app_service.start_verify_img_deal_new_thread()
+    # juejin_spider_schedule()
     while True:
         biz_log.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         time.sleep(1000)

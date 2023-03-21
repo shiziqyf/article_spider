@@ -16,10 +16,12 @@ def start_task(task_type):
         return
     execute_task(task)
 
-
+# todo 并发控制，目前实现有问题
 def execute_task(task: Task):
     biz_log = global_var.get_value('biz_log')
     # 任务最多执行3次，超过3次还是失败，则任务优先级降低
+    update_task = Task(status=2)
+    TaskDAO.updatedById(task_id=task.id, task=update_task)
     count = 0
     while count < 3:
         count = count + 1
@@ -43,7 +45,7 @@ def execute_task(task: Task):
 
     biz_log.error('task execute fail too many, priority will reduce, id=%s', task.id)
     reduce_priority = task.priority - 1
-    update_task = Task(priority=reduce_priority)
+    update_task = Task(priority=reduce_priority, status=0)
     TaskDAO.updatedById(task_id=task.id, task=update_task)
 
 
@@ -59,12 +61,10 @@ def start_article():
 
 def start_img():
     biz_log = global_var.get_value('biz_log')
-    while True:
-        try:
-            time.sleep(0.5)
-            start_task('IMG')
-        except Exception:
-            biz_log.error('start img task fail, err=%s', traceback.format_exc())
+    try:
+        start_task('IMG')
+    except Exception:
+        biz_log.error('start img task fail, err=%s', traceback.format_exc())
 
 
 def start_article_with_new_thread():
@@ -79,7 +79,7 @@ def start_img_with_new_thread():
     biz_log = global_var.get_value('biz_log')
     biz_log.info('start_img_with_new_thread......')
     schedule = BackgroundScheduler()
-    schedule.add_job(start_img, trigger='interval', seconds=1)
+    schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=2)
     schedule.start()
 
     # thread = threading.Thread(target=start_img)

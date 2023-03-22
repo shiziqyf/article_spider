@@ -61,10 +61,17 @@ def start_article():
 
 def start_img():
     biz_log = global_var.get_value('biz_log')
-    try:
-        start_task('IMG')
-    except Exception:
-        biz_log.error('start img task fail, err=%s', traceback.format_exc())
+    while True:
+        try:
+            time.sleep(0.5)
+            start_task('IMG')
+        except Exception:
+            biz_log.error('start img task fail, err=%s', traceback.format_exc())
+    # biz_log = global_var.get_value('biz_log')
+    # try:
+    #     start_task('IMG')
+    # except Exception:
+    #     biz_log.error('start img task fail, err=%s', traceback.format_exc())
 
 
 def start_article_with_new_thread():
@@ -78,9 +85,12 @@ def start_article_with_new_thread():
 def start_img_with_new_thread():
     biz_log = global_var.get_value('biz_log')
     biz_log.info('start_img_with_new_thread......')
-    schedule = BackgroundScheduler()
-    schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=1)
-    schedule.start()
+    thread = threading.Thread(target=start_img)
+    thread.daemon = True
+    thread.start()
+    # schedule = BackgroundScheduler()
+    # schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=1)
+    # schedule.start()
 
     # thread = threading.Thread(target=start_img)
     # thread.daemon = True

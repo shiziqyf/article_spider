@@ -10,6 +10,7 @@ from dao.mysqlConn import MysqlConnUtil
 from log.logger_handler import LoggerHandler
 from spider import task_dispatch, juejin
 from spider.server import oss_service
+from thread_manage import thread_manage
 
 
 def init_config(args):
@@ -35,10 +36,11 @@ def init_resource():
     oss_service.init()
 
 
-def juejin_spider_schedule():
+def start_schedule():
     schedule = BackgroundScheduler()
     juejin.juejin_spider_start()
     schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)
+    schedule.add_job(thread_manage.check_thread, trigger='interval', seconds=300)
     schedule.start()
 
 
@@ -51,7 +53,7 @@ if __name__ == '__main__':
     task_dispatch.start_article_with_new_thread()
     task_dispatch.start_img_with_new_thread()
     article_app_service.start_verify_img_deal_new_thread()
-    juejin_spider_schedule()
+    start_schedule()
     while True:
         biz_log.info(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         time.sleep(1000)

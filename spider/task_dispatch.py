@@ -4,6 +4,7 @@ import traceback
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import global_var
+import thread_manage.thread_manage
 from dao.model.task import Task
 from dao.taskDAO import TaskDAO
 import threading
@@ -80,6 +81,8 @@ def start_article_with_new_thread():
     thread = threading.Thread(target=start_article)
     thread.daemon = True
     thread.start()
+    thread_ident = thread.ident
+    thread_manage.thread_manage.add_need_manage_thread(thread_ident, "article_spider")
 
 
 def start_img_with_new_thread():
@@ -88,6 +91,9 @@ def start_img_with_new_thread():
     thread = threading.Thread(target=start_img)
     thread.daemon = True
     thread.start()
+    thread_ident = thread.ident
+    thread_manage.thread_manage.add_need_manage_thread(thread_ident, "img_spider")
+    # threading.
     # schedule = BackgroundScheduler()
     # schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=1)
     # schedule.start()

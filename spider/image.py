@@ -32,30 +32,38 @@ def generate_img_task_from_html(parent_task_id, serial_id, article_resource_id, 
 
 def img_task_execute(task_id, execute_params):
     biz_log = global_var.get_value('biz_log')
+    debug_log = global_var.get_value('debug_log')
     biz_log.info('img_task_execute, task_id=%s', task_id)
     img_url = execute_params['img_url']
     old_image = ImageDAO.queryOneByUrl(img_url)
+    debug_log.info('img_task_execute--query_old_img finish, task_id=%s', task_id)
     need_upload_oss = True
     if old_image is not None:
         old_oss_key = old_image.oss_key
         if oss_service.exist(old_oss_key):
             need_upload_oss = False
+    debug_log.info('img_task_execute--judge need_upload_oss finish, task_id=%s, need_upload_oss=%s', task_id, need_upload_oss)
     if need_upload_oss:
         oss_key = upload_image_to_oss_from_url(img_url)
+        debug_log.info('img_task_execute--download and upload_oss finish, task_id=%s, oss_key=%s', task_id, oss_key)
         article_resource_id = execute_params['article_resource_id']
         image = ImageResource(url=img_url, oss_key=oss_key, from_task_id=task_id, from_article_resource_id=article_resource_id)
         image_service.save_image(image)
+        debug_log.info('img_task_execute--save_image finish, task_id=%s', task_id)
     biz_log.info('img_task_execute finish, url=%s, task_id=%s', img_url, task_id)
 
 
 def upload_image_to_oss_from_url(url):
     biz_log = global_var.get_value('biz_log')
+    debug_log = global_var.get_value('debug_log')
     headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
     resp = requests.get(url, headers=headers, stream=True)
+    debug_log.info('img_task_execute--get from url finish, url=%s', url)
     oss_key = ''
     if resp.status_code == 200:
         oss_key = oss_service.upload_network_stream(url, resp)
-        folder_path = settings.img_cache_path + "/" + common.get_today_time_str()
+        debug_log.info('img_task_execute--upload to oss finish, url=%s', url)
+    # folder_path = settings.img_cache_path + "/" + common.get_today_time_str()
         # if not os.path.exists(folder_path):
         #     os.makedirs(folder_path)
         # img_file = folder_path + "/" + common.generate_random_id() + '-img'

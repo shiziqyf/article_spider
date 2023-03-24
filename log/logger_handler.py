@@ -33,4 +33,6 @@ class LoggerHandler:
     def init_log():
         print("start init log......")
         biz_log = LoggerHandler(settings.log.biz_file).log
+        debug_log = LoggerHandler(settings.log.debug_file).log
         global_var.set_value('biz_log', biz_log)
+        global_var.set_value('debug_log', debug_log)

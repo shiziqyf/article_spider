@@ -22,12 +22,12 @@ detail_repeat_keep_time = -1  # 永久
 
 
 def req_post_json(url, json_body):
-    response = requests.post(url=url, json=json_body)
+    response = requests.post(url=url, json=json_body, timeout=60)
     return response.json()
 
 
 def req_get_text(url):
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     return response.content.decode('utf-8', 'ignore').encode('gbk', 'replace').decode('gbk', 'replace')
     # return response.text.encode('utf-8').decode('utf-8')
 

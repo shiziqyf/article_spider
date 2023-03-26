@@ -57,7 +57,7 @@ def upload_image_to_oss_from_url(url):
     biz_log = global_var.get_value('biz_log')
     debug_log = global_var.get_value('debug_log')
     headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
-    resp = requests.get(url, headers=headers, stream=True)
+    resp = requests.get(url, headers=headers, stream=True, timeout=60)
     debug_log.info('img_task_execute--get from url finish, url=%s', url)
     oss_key = ''
     if resp.status_code == 200:

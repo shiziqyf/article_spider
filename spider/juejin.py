@@ -131,9 +131,9 @@ def detail_task_execute(task_id, execute_params):
     biz_log.info('juejin_detail_task_execute, url=%s, task_id=%s', url, task_id)
     resp_data_text = req_get_text(url)
     root = etree.HTML(resp_data_text)
-    title_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/h1/text()')
+    title_s = root.xpath('//*/h1[@class="article-title"]/text()')
     content_s = root.xpath('//*[@id="juejin"]//div[contains(@class,"article-content")][1]')
-    published_time_s = root.xpath('//*[@id="juejin"]/div[1]/main/div/div[1]/article/div[3]/div/div[2]/time/text()')
+    published_time_s = root.xpath('//*/div[contains(@class, "meta-box")]/time/text()')
     title = list_first(title_s)
     content = list_first(content_s)
     if len(content) < 1:

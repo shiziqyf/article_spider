@@ -77,7 +77,7 @@ class TaskDAO:
         conn = None
         cursor = None
         try:
-            sql = 'select * from spider_task where status = 0 and task_type = %s order by priority desc, created_time asc limit 1'
+            sql = 'select * from spider_task where status = 0 and task_type = %s order by priority desc limit 1'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
             cursor.execute(sql, task_type)

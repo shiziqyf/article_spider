@@ -57,13 +57,19 @@ def upload_image_to_oss_from_url(url):
     biz_log = global_var.get_value('biz_log')
     debug_log = global_var.get_value('debug_log')
     headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
-    resp = requests.get(url, headers=headers, stream=True, timeout=60)
+    resp = requests.get(url, headers=headers, timeout=60)
+    resp_content_length = len(resp.content)
+    headers_len = resp.headers['Content-Length']
+    biz_log.info('resp_content_length=%s, headers_len=%s, url=%s', resp_content_length, headers_len, url)
+    if str(resp_content_length) != str(headers_len):
+        biz_log.info('resp_content len is diff, url={}', url)
+    # resp.hea
     debug_log.info('img_task_execute--get from url finish, url=%s', url)
     oss_key = ''
     if resp.status_code == 200:
         oss_key = oss_service.upload_network_stream(url, resp)
         debug_log.info('img_task_execute--upload to oss finish, url=%s', url)
-    # folder_path = settings.img_cache_path + "/" + common.get_today_time_str()
+        # folder_path = settings.img_cache_path + "/" + common.get_today_time_str()
         # if not os.path.exists(folder_path):
         #     os.makedirs(folder_path)
         # img_file = folder_path + "/" + common.generate_random_id() + '-img'

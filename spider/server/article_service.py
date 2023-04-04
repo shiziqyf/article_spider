@@ -18,7 +18,7 @@ def saveArticle(article: Article):
 
 
 def get_img_urls_from_html(html_str):
-    return re.findall('img src="(.*?)"', html_str, re.S)
+    return re.findall('img[\s\S]+?src=[\'\"](.*?)[\'\"]', html_str, re.S)
 
 
 # 检查 article 图片是否处理完成

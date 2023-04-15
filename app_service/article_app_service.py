@@ -12,7 +12,6 @@ from spider.server.article_service import get_img_urls_from_html
 
 def verify_article_img_deal(article):
     biz_log = global_var.get_value('biz_log')
-    biz_log.info('start verify_article_img_deal, articleId= %s', article.id)
     # biz_log.info('start verify_img_deal, article_id = %s', article.id)
     content_dirt = json.loads(article.content_pack)
     urls = get_img_urls_from_html(content_dirt['content'])

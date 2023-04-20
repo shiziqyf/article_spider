@@ -40,7 +40,7 @@ def start_schedule():
     schedule = BackgroundScheduler()
     juejin.juejin_spider_start()
     schedule.add_job(juejin.juejin_spider_start, trigger='interval', seconds=300)
-    schedule.add_job(thread_manage.check_thread, trigger='interval', seconds=300)
+    # schedule.add_job(thread_manage.check_thread, trigger='interval', seconds=300)
     schedule.start()
 
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     # 任务调度启动
     task_dispatch.start_article_with_new_thread()
-    task_dispatch.start_img_with_new_thread()
+    task_dispatch.start_img_with_new_thread(4)
     article_app_service.start_verify_img_deal_new_thread()
     start_schedule()
     while True:

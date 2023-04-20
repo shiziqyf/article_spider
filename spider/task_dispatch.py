@@ -9,20 +9,33 @@ from dao.model.task import Task
 from dao.taskDAO import TaskDAO
 import threading
 
+lock = threading.Lock()
+
 
 def start_task(task_type):
     # 获取最早的优先级最高的任务
-    task = TaskDAO.queryEarliestTaskByType(task_type)
+    # task = TaskDAO.queryEarliestTaskByType(task_type)
+    task = get_lock_task(task_type)
     if task is None:
         return
     execute_task(task)
 
-# todo 并发控制，目前实现有问题
+
+def get_lock_task(task_type):
+    task = None
+    with lock:
+        task = TaskDAO.queryEarliestTaskByType(task_type)
+        if task is None:
+            return
+        update_task = Task(status=2)
+        TaskDAO.updatedById(task_id=task.id, task=update_task)
+    return task
+
+
 def execute_task(task: Task):
     biz_log = global_var.get_value('biz_log')
     # 任务最多执行3次，超过3次还是失败，则任务优先级降低
-    update_task = Task(status=2)
-    TaskDAO.updatedById(task_id=task.id, task=update_task)
+
     count = 0
     while count < 3:
         count = count + 1
@@ -85,14 +98,16 @@ def start_article_with_new_thread():
     thread_manage.thread_manage.add_need_manage_thread(thread_ident, "article_spider")
 
 
-def start_img_with_new_thread():
+def start_img_with_new_thread(thread_num):
     biz_log = global_var.get_value('biz_log')
-    biz_log.info('start_img_with_new_thread......')
-    thread = threading.Thread(target=start_img)
-    thread.daemon = True
-    thread.start()
-    thread_ident = thread.ident
-    thread_manage.thread_manage.add_need_manage_thread(thread_ident, "img_spider")
+    for i in range(thread_num):
+        biz_log.info('start_img_with_new_thread......')
+        thread = threading.Thread(target=start_img)
+        thread.daemon = True
+        thread.start()
+        thread_ident = thread.ident
+        thread_manage.thread_manage.add_need_manage_thread(thread_ident, "img_spider")
+
     # threading.
     # schedule = BackgroundScheduler()
     # schedule.add_job(start_img, trigger='interval', seconds=1, max_instances=1)

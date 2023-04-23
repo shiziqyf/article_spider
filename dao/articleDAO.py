@@ -26,7 +26,7 @@ class ArticleDAO:
         conn = None
         cursor = None
         try:
-            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status, gmt_created_time ' \
+            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status, content_oss_key, gmt_created_time ' \
                   'from  article_resource where source_url = %s'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()
@@ -44,7 +44,7 @@ class ArticleDAO:
         conn = None
         cursor = None
         try:
-            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status, gmt_created_time ' \
+            sql = 'select id, source, source_url, content_pack, from_task_id, img_deal_status, content_oss_key, gmt_created_time ' \
                   'from  article_resource where img_deal_status = %s and id > %s order by id asc limit 1'
             conn = MysqlConnUtil.getConn()
             cursor = conn.cursor()

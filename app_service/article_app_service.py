@@ -6,7 +6,6 @@ import global_var
 from dao.articleDAO import ArticleDAO
 from dao.imageDAO import ImageDAO
 from dao.model.article import Article
-from spider.image import generate_img_task_from_html
 from spider.server.article_service import get_img_urls_from_html
 
 

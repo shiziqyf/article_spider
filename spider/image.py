@@ -57,7 +57,7 @@ def upload_image_to_oss_from_url(url):
     biz_log = global_var.get_value('biz_log')
     debug_log = global_var.get_value('debug_log')
     headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"}
-    resp = requests.get(url, headers=headers, timeout=60, verify=False)
+    resp = requests.get(url, headers=headers, timeout=(5, 30), verify=False)
     resp_content_length = len(resp.content)
     headers_len = resp.headers['Content-Length']
     biz_log.info('resp_content_length=%s, headers_len=%s, url=%s', resp_content_length, headers_len, url)

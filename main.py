@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     # 任务调度启动
     task_dispatch.start_article_with_new_thread()
-    task_dispatch.start_img_with_new_thread(3)
+    task_dispatch.start_img_with_new_thread(2)
     article_app_service.start_verify_img_deal_new_thread()
     start_schedule()
     while True:

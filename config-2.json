@@ -1,0 +1,12 @@
+{
+  "mysql": {
+    "host": "localhost",
+    "port": "3306",
+    "username": "root",
+    "password": "***"
+  },
+  "log": {
+    "biz_file": "/Users/shizi/Desktop/log/juejin.log"
+  }
+
+}
